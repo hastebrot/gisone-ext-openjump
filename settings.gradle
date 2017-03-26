@@ -1,5 +1,5 @@
 // name of root project.
-rootProject.name = "javafx-cartographic-canvas"
+rootProject.name = file(".").name
 
 // include project directories.
 def buildScripts = fileTree(".")
