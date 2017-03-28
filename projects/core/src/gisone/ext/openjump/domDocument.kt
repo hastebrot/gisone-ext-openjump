@@ -17,27 +17,28 @@ import javax.xml.bind.annotation.XmlValue
 import javax.xml.transform.OutputKeys
 
 fun main(args: Array<String>) {
-    val xml = sampleJavaXmlProcessing()
-    sampleJavaXmlBinding(xml)
+    val doc = javaXmlDocument()
+    javaXmlProcessing(doc)
+    javaXmlBinding(doc)
 }
 
-fun sampleJavaXmlProcessing(): String {
-    val doc = createDocument()
-
-    doc.addElement("customer") {
-        setAttribute("first-name", "Jane")
-        setAttribute("last-name", "Doe")
-        addElement("address") {
-            addElement("street") {
-                appendText("123 A Street")
-            }
-            addElement("phone-number") {
-                setAttribute("type", "work")
-                appendText("555-1111")
-            }
-            addElement("phone-number") {
-                setAttribute("type", "cell")
-                appendText("555-2222")
+fun javaXmlDocument(): Document {
+    val doc = createDocument().apply {
+        addElement("customer") {
+            setAttribute("first-name", "Jane")
+            setAttribute("last-name", "Doe")
+            addElement("address") {
+                addElement("street") {
+                    appendText("123 A Street")
+                }
+                addElement("phone-number") {
+                    setAttribute("type", "work")
+                    appendText("555-1111")
+                }
+                addElement("phone-number") {
+                    setAttribute("type", "cell")
+                    appendText("555-2222")
+                }
             }
         }
     }
@@ -45,17 +46,21 @@ fun sampleJavaXmlProcessing(): String {
     val xml = doc.toPrettyXmlString()
     println(xml)
 
+    return doc
+}
+
+fun javaXmlProcessing(doc: Document) {
     println(doc.elements("customer")[0].getAttribute("first-name"))
     println(doc.elements("phone-number").map { it.children()[0].textContent })
     println(doc.elements("street")[0].textContent)
 //    println(doc.elements("phone-number")[0].toXmlString())
-    return xml
 }
 
-fun sampleJavaXmlBinding(xml: String) {
+fun javaXmlBinding(doc: Document) {
     val unmarshaller = JAXBContext.newInstance(Customer::class.java)
         .createUnmarshaller()
-    val customer = unmarshaller.unmarshal(xml.reader()) as Customer
+    val customer = unmarshaller.unmarshal(doc.toXmlString().reader()) as Customer
+
     println(customer)
     println(customer.address)
     println(customer.address?.phoneNumbers)
